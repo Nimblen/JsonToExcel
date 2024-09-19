@@ -1,0 +1,59 @@
+{
+    "employees": [
+        {
+            "Employee ID": "E001",
+            "Name": "Alice Johnson",
+            "Department": "Engineering",
+            "Role": "Senior Engineer",
+            "Salary": 95000,
+            "Start Date": "2021-03-15",
+            "Position": "Senior",
+            "End Date": null,
+            "Reason": null
+        },
+        {
+            "Employee ID": "E002",
+            "Name": "Bob Smith",
+            "Department": "Marketing",
+            "Role": "Marketing Manager",
+            "Salary": 78000,
+            "Start Date": "2019-07-22",
+            "Position": null,
+            "End Date": null,
+            "Reason": null
+        },
+        {
+            "Employee ID": "E003",
+            "Name": "Charlie Davis",
+            "Department": "Sales",
+            "Role": "Sales Representative",
+            "Salary": 62000,
+            "Start Date": "2022-01-01",
+            "Position": null,
+            "End Date": "2022-06-30",
+            "Reason": "Contract"
+        },
+        {
+            "Employee ID": "E004",
+            "Name": "David Wilson",
+            "Department": "Engineering",
+            "Role": "Engineer",
+            "Salary": 50000,
+            "Start Date": "2020-09-01",
+            "Position": null,
+            "End Date": null,
+            "Reason": null
+        },
+        {
+            "Employee ID": "E005",
+            "Name": "Emily Johnson",
+            "Department": "Engineering",
+            "Role": "Engineer",
+            "Salary": 50000,
+            "Start Date": "2020-09-01",
+            "Position": null,
+            "End Date": null,
+            "Reason": null
+        }
+    ]
+}
