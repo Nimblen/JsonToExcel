@@ -31,22 +31,30 @@ def style_cell(
 
 
 def create_headers(ws, headers: list, column_mapping: dict):
-
+    """Create headers for excel file(A1, B1, C1, ...)"""
     for col_num, header in enumerate(headers, 1):
         col_letter = get_column_letter(col_num)
         cell = ws[f"{col_letter}1"]
         cell.value = header
+        # highlight headers
         style_cell(cell, alignment=ALIGN_CENTER, font=Font(bold=True))
-        ws.column_dimensions[col_letter].width = len(header) + COLUMN_WIDTH_PADDING
         column_mapping[header] = col_letter
 
 
-def write_row(ws, row: dict, all_columns: list, column_mapping: dict, row_num: int):
-    for col_name in all_columns:
-        col_letter = column_mapping[col_name]
+def write_row(ws, row, column_mapping, row_num):
+    for col_name, col_letter in column_mapping.items():
         cell = ws[f"{col_letter}{row_num}"]
         cell.value = row.get(col_name, "")
         style_cell(cell)
+
+
+def set_column_width(ws, column_mapping: dict, rows_data: list):
+    for col_letter in column_mapping.values():
+        max_length = max(
+            len(str(ws[f"{col_letter}{row_num}"].value))
+            for row_num in range(1, len(rows_data) + 1)
+        )
+        ws.column_dimensions[col_letter].width = max_length + COLUMN_WIDTH_PADDING
 
 
 def create_excel_from_data(
@@ -54,6 +62,7 @@ def create_excel_from_data(
     path_to_output_file_name: str = f"{DEFAULT_PATH_TO_OUTPUT_FOLDER}output.xlsx",
 ):
     wb = openpyxl.Workbook()
+    # del the default sheet
     if "Sheet" in wb.sheetnames:
         del wb["Sheet"]
 
@@ -70,14 +79,9 @@ def create_excel_from_data(
         create_headers(ws, all_columns, column_mapping)
 
         for row_num, row in enumerate(rows_data, 2):
-            write_row(ws, row, all_columns, column_mapping, row_num)
+            write_row(ws, row, column_mapping, row_num)
 
-        for col_letter in column_mapping.values():
-            max_length = max(
-                len(str(ws[f"{col_letter}{row_num}"].value))
-                for row_num in range(1, len(rows_data) + 2)
-            )
-            ws.column_dimensions[col_letter].width = max_length + COLUMN_WIDTH_PADDING
+        set_column_width(ws, column_mapping, rows_data)
     try:
         wb.save(path_to_output_file_name)
     except Exception as e:
@@ -88,7 +92,6 @@ def create_json_from_excel(
     path_to_excel_file,
     path_to_output_file_name=f"{DEFAULT_PATH_TO_OUTPUT_FOLDER}output.json",
 ):
-    print(path_to_excel_file)
     wb = openpyxl.load_workbook(path_to_excel_file)
     result_data = {}
 
@@ -123,14 +126,29 @@ def load_json_data(path_to_input_file: str):
 
 
 if __name__ == "__main__":
-    input_file = ARGS.input
-    output_file = ARGS.output
-    file_type = input_file.split(".")[-1]
+    if ARGS.input:
+        input_file = ARGS.input
+        file_type = input_file.split(".")[-1]
+        output_file = ARGS.output
 
-    if file_type == "xlsx":
-        create_json_from_excel(input_file, path_to_output_file_name=output_file)
-    elif file_type == "json":
-        data = load_json_data(input_file)
-        create_excel_from_data(data, path_to_output_file_name=output_file)
-    else:
-        print(f"Unsupported file type: {file_type}")
+        if file_type == "xlsx":
+            create_json_from_excel(
+                input_file,
+                path_to_output_file_name=(
+                    output_file
+                    if output_file
+                    else f"{DEFAULT_PATH_TO_OUTPUT_FOLDER}output.json"
+                ),
+            )
+        elif file_type == "json":
+            data = load_json_data(input_file)
+            create_excel_from_data(
+                data,
+                path_to_output_file_name=(
+                    output_file
+                    if output_file
+                    else f"{DEFAULT_PATH_TO_OUTPUT_FOLDER}output.xlsx"
+                ),
+            )
+        else:
+            print(f"Unsupported file type: {file_type}")

@@ -6,6 +6,7 @@ import os
 from scripts.commands import parser
 from scripts.main import create_excel_from_data, create_json_from_excel, load_json_data
 
+
 @pytest.fixture()
 def test_data():
     TEST_DATA = {
@@ -37,14 +38,13 @@ def test_data():
     return TEST_DATA, TEST_EXCEL_FILE, TEST_JSON_FILE
 
 
-
 def test_create_excel_from_data(test_data):
     TEST_DATA, TEST_EXCEL_FILE, _ = test_data
     create_excel_from_data(TEST_DATA, path_to_output_file_name=TEST_EXCEL_FILE)
     wb = openpyxl.load_workbook(TEST_EXCEL_FILE)
     assert wb.sheetnames[0] == "employees"
     assert wb.sheetnames[1] == "offices"
-    
+
     ws = wb["employees"]
     assert ws["A1"].value == "ID"
     assert ws["A2"].value == 637
@@ -52,6 +52,7 @@ def test_create_excel_from_data(test_data):
     ws = wb["offices"]
     assert ws["A1"].value == "ID"
     assert ws["A2"].value == 1
+
 
 def test_create_json_from_excel(test_data):
     _, TEST_EXCEL_FILE, TEST_JSON_FILE = test_data
@@ -61,11 +62,13 @@ def test_create_json_from_excel(test_data):
         assert data["employees"][0]["ID"] == 637
         assert data["offices"][0]["ID"] == 1
 
+
 def test_load_json_data(test_data):
     _, _, TEST_JSON_FILE = test_data
     data = load_json_data(path_to_input_file=TEST_JSON_FILE)
     assert data["employees"][0]["ID"] == 637
     assert data["offices"][0]["ID"] == 1
+
 
 def test_set_style(test_data):
     _, TEST_EXCEL_FILE, _ = test_data
@@ -81,6 +84,7 @@ def test_set_style(test_data):
 
     ws_offices["A1"].font = Font(bold=True)
     assert ws_offices["A1"].font.bold is True
+
 
 @pytest.fixture(autouse=True)
 def setup_teardown(test_data):
@@ -99,13 +103,22 @@ def setup_teardown(test_data):
         os.remove(TEST_JSON_FILE)
 
 
-
 def test_argparse_input(monkeypatch):
-    monkeypatch.setattr('sys.argv', ['scripts/main.py', '--input', 'data/example_data.json', '--output', 'result.xlsx', '--sheet-name', 'DataSheet'])
-
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "scripts/main.py",
+            "--input",
+            "data/example_data.json",
+            "--output",
+            "result.xlsx",
+            "--sheet-name",
+            "DataSheet",
+        ],
+    )
 
     args = parser.parse_args()
 
-    assert args.input == ['data/example_data.json']
-    assert args.output == 'result.xlsx'
-    assert args.sheet_name == 'DataSheet'
+    assert args.input == ["data/example_data.json"]
+    assert args.output == "result.xlsx"
+    assert args.sheet_name == "DataSheet"
