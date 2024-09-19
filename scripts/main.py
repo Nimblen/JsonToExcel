@@ -2,6 +2,7 @@ import json
 import openpyxl
 from openpyxl.styles import Alignment, Border, Side, Font
 from openpyxl.utils import get_column_letter
+from commands import parser
 
 ALIGN_CENTER = Alignment(horizontal="center", vertical="center")
 ALIGN_LEFT = Alignment(horizontal="left", vertical="center")
@@ -12,6 +13,7 @@ BORDER_STYLE = Border(
     bottom=Side(style="thin"),
 )
 COLUMN_WIDTH_PADDING = 2
+ARGS = parser.parse_args()
 
 DEFAULT_PATH_TO_OUTPUT_FOLDER = "data/"
 
@@ -86,6 +88,7 @@ def create_json_from_excel(
     path_to_excel_file,
     path_to_output_file_name=f"{DEFAULT_PATH_TO_OUTPUT_FOLDER}output.json",
 ):
+    print(path_to_excel_file)
     wb = openpyxl.load_workbook(path_to_excel_file)
     result_data = {}
 
@@ -119,5 +122,15 @@ def load_json_data(path_to_input_file: str):
         return {}
 
 
-# data = load_json_data("data/example_data.json")
-# create_excel_from_data(data)
+if __name__ == "__main__":
+    input_file = ARGS.input
+    output_file = ARGS.output
+    file_type = input_file.split(".")[-1]
+
+    if file_type == "xlsx":
+        create_json_from_excel(input_file, path_to_output_file_name=output_file)
+    elif file_type == "json":
+        data = load_json_data(input_file)
+        create_excel_from_data(data, path_to_output_file_name=output_file)
+    else:
+        print(f"Unsupported file type: {file_type}")

@@ -3,7 +3,7 @@ import pytest
 import openpyxl
 from openpyxl.styles import Alignment, Font
 import os
-
+from scripts.commands import parser
 from scripts.main import create_excel_from_data, create_json_from_excel, load_json_data
 
 @pytest.fixture()
@@ -98,3 +98,14 @@ def setup_teardown(test_data):
     if os.path.exists(TEST_JSON_FILE):
         os.remove(TEST_JSON_FILE)
 
+
+
+def test_argparse_input(monkeypatch):
+    monkeypatch.setattr('sys.argv', ['scripts/main.py', '--input', 'data/example_data.json', '--output', 'result.xlsx', '--sheet-name', 'DataSheet'])
+
+
+    args = parser.parse_args()
+
+    assert args.input == ['data/example_data.json']
+    assert args.output == 'result.xlsx'
+    assert args.sheet_name == 'DataSheet'
